@@ -18,8 +18,8 @@
         {%- assign md_content = item.content | split: "\n" -%}
         {%- assign heading = "" -%}
         {%- for line in md_content -%}
-            {%- if line startswith: "# " -%}
-                {%- assign heading = line | remove: "# " | strip -%}
+            {%- if line | slice: 0, 2 == "# " -%}
+                {%- assign heading = line | slice: 2, line.size | strip -%}
                 {%- break -%}
             {%- endif -%}
         {%- endfor -%}
