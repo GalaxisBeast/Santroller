@@ -13,13 +13,13 @@
 {%- endif -%}
 
 <ul>
-    {%- comment %} List files with first ### heading {% endcomment %}
+    {%- comment %} List files with first # heading {% endcomment %}
     {%- for item in workdir_files -%}
         {%- assign md_content = item.content | split: "\n" -%}
         {%- assign heading = "" -%}
         {%- for line in md_content -%}
-            {%- if line contains "### " -%}
-                {%- assign heading = line | remove: "### " | strip -%}
+            {%- if line startswith: "# " -%}
+                {%- assign heading = line | remove: "# " | strip -%}
                 {%- break -%}
             {%- endif -%}
         {%- endfor -%}
@@ -37,11 +37,12 @@
     {%- endfor -%}
 
     {%- comment %} List directories as dropdowns {% endcomment %}
-    {%- for workdir in workdir_dirs -%}
-        {%- assign level = workdir | append: "temp" | replace_first: "/", "" | split: "/" | size | minus: 2 -%}
+    {%- for subdir in workdir_dirs -%}
+        {%- assign level = subdir | append: "temp" | replace_first: "/", "" | split: "/" | size | minus: 2 -%}
         <li class="toc level-{{ level }}">
-            <button class="folder-toggle">{{ workdir | split: "/" | last }}</button>
+            <button class="folder-toggle" type="button">{{ subdir | split: "/" | last }}</button>
             <ul class="dropdown">
+                {%- assign workdir = subdir -%}
                 {% include templates/_toctree.liquid %}
             </ul>
         </li>
