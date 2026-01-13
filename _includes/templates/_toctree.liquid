@@ -2,8 +2,20 @@
 
 <ul class="toc-root">
 
-    {%- comment %} Directories: category dropdowns {% endcomment %}
-    {%- for subdir in workdir_dirs -%}
+    {%- comment %} Directories: category dropdowns (computed from workdir_files) {% endcomment %}
+    {%- assign _dirs_str = "" -%}
+    {%- for f in workdir_files -%}
+        {%- if f.dir != "" -%}
+            {%- unless _dirs_str contains f.dir -%}
+                {%- assign _dirs_str = _dirs_str | append: f.dir | append: "||" -%}
+            {%- endunless -%}
+        {%- endif -%}
+    {%- endfor -%}
+    {%- assign subdirs = _dirs_str | split: "||" -%}
+    {%- for subdir in subdirs -%}
+        {%- if subdir == "" -%}
+            {%- continue -%}
+        {%- endif -%}
         {%- assign folder_active = false -%}
         {%- for item in workdir_files -%}
             {%- if item.url contains subdir and page.url == item.url -%}
