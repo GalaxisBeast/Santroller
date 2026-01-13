@@ -24,10 +24,11 @@
             {%- endif -%}
         {%- endfor -%}
         <li class="toc-category">
-            <button class="folder-toggle{% if folder_active %} active{% endif %}" type="button" aria-expanded="{% if folder_active %}true{% else %}false{% endif %}">
-                {{ subdir | split: "/" | last }}
-            </button>
-            <ul class="dropdown">
+            <details class="folder-details"{% if folder_active %} open{% endif %}>
+                <summary class="folder-toggle" role="button" aria-expanded="{% if folder_active %}true{% else %}false{% endif %}">
+                    {{ subdir | split: "/" | last }}
+                </summary>
+                <ul class="dropdown">
                 {%- assign workdir = subdir -%}
                 {%- for item in workdir_files -%}
                     {%- if item.url contains subdir -%}
@@ -49,25 +50,18 @@
                         </li>
                     {%- endif -%}
                 {%- endfor -%}
-            </ul>
+                </ul>
+            </details>
         </li>
     {%- endfor -%}
 
 </ul>
 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    document.querySelectorAll('.folder-toggle').forEach(btn => {
-        btn.addEventListener('click', () => {
-            btn.classList.toggle('active');
-        });
-    });
-});
-</script>
-
 <style>
-.toc-category > .dropdown { display: none; margin-left: 1em; }
-.folder-toggle.active + .dropdown { display: block; }
+.toc-category .dropdown { display: none; margin-left: 1em; }
+.folder-details[open] > .dropdown { display: block; }
 .folder-toggle { background: none; border: none; font-weight: bold; cursor: pointer; padding: 0.25em 0; width: 100%; text-align: left; }
+.folder-details > summary { list-style: none; }
+.folder-details > summary::-webkit-details-marker { display: none; }
 .toc-file a.current { font-weight: bold; }
 </style>
