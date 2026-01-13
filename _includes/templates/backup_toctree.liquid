@@ -21,8 +21,19 @@
             {%- if line startswith: "# " -%}
                 {%- assign heading = line | remove: "# " | strip -%}
                 {%- break -%}
+            {%- elsif line contains "<h1" -%}
+                {%- assign heading = line | strip_html | strip -%}
+                {%- break -%}
             {%- endif -%}
         {%- endfor -%}
+        {%- if heading == "" -%}
+            {%- for line in md_content -%}
+                {%- if line startswith: "## " -%}
+                    {%- assign heading = line | remove: "## " | strip -%}
+                    {%- break -%}
+                {%- endif -%}
+            {%- endfor -%}
+        {%- endif -%}
 
         {%- assign level = item.dir | append: "temp" | replace_first: "/", "" | split: "/" | size | minus: 1 -%}
         {%- capture current -%}

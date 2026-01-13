@@ -9,8 +9,19 @@
             {%- if line | slice: 0, 2 == "# " -%}
                 {%- assign heading = line | slice: 2, line.size | strip -%}
                 {%- break -%}
+            {%- elsif line contains "<h1" -%}
+                {%- assign heading = line | strip_html | strip -%}
+                {%- break -%}
             {%- endif -%}
         {%- endfor -%}
+        {%- if heading == "" -%}
+            {%- for line in md_content -%}
+                {%- if line | slice: 0, 3 == "## " -%}
+                    {%- assign heading = line | slice: 3, line.size | strip -%}
+                    {%- break -%}
+                {%- endif -%}
+            {%- endfor -%}
+        {%- endif -%}
         {%- assign display_title = heading | default: item.title | default: item.name -%}
         {%- assign level = item.dir | append: "temp" | replace_first: "/", "" | split: "/" | size -%}
         {%- capture current -%}
