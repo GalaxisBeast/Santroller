@@ -1,25 +1,31 @@
 {%- include common/rest/workdir.liquid %}
 
-{% comment %} Debug: show workdir variables for troubleshooting {% endcomment %}
-<details class="toc-debug">
-  <summary>Debug: workdir variables</summary>
-  <div>
-    <p><strong>workdir_dirs (count):</strong> {{ workdir_dirs | size }}</p>
-    <ul>
-      {%- for d in workdir_dirs -%}
-        <li>{{ d }}</li>
-      {%- endfor -%}
-    </ul>
-    <p><strong>workdir_files (count):</strong> {{ workdir_files | size }}</p>
-    <ol>
-      {%- for f in workdir_files limit:8 -%}
-        <li><code>{{ f.url }}</code> — {{ f.title | default: f.name }}</li>
-      {%- endfor -%}
-    </ol>
-  </div>
-</details>
+{% comment %} list the root files (use first H1 if present) {% endcomment %}
+<ul>
+    {%- for item in workdir_files -%}
+        {%- assign md_content = item.content | split: "\n" -%}
+        {%- assign heading = "" -%}
+        {%- for line in md_content -%}
+            {%- if line | slice: 0, 2 == "# " -%}
+                {%- assign heading = line | slice: 2, line.size | strip -%}
+                {%- break -%}
+            {%- endif -%}
+        {%- endfor -%}
+        {%- assign display_title = heading | default: item.title | default: item.name -%}
+        {%- assign level = item.dir | append: "temp" | replace_first: "/", "" | split: "/" | size -%}
+        {%- capture current -%}
+            {%- if page.url == item.url %}current{% endif -%}
+        {%- endcapture %}
+        <li class="toc level-{{ level }} {{ current }}" data-sort="{{ item.sort }}" data-level="{{ level }}">
+            <a class="d-flex flex-items-baseline {{ current }}" href="{{ item.url | relative_url }}">
+                {{ display_title }}
+            </a>
+        </li>
+    {%- endfor %}
+</ul>
 
-{% comment %} list the root files {% endcomment %}
+{% comment %} list the root dirs {% endcomment %}
+{%- for workdir in workdir_dirs %}{% include templates/_toctree.liquid %}{% endfor -%}
 <ul>
     {%- for item in workdir_files -%}
         {%- assign level = item.dir | append: "temp" | replace_first: "/", "" | split: "/" | size -%}

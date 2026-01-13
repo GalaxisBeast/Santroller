@@ -4,8 +4,15 @@
 
     {%- comment %} Directories: category dropdowns {% endcomment %}
     {%- for subdir in workdir_dirs -%}
+        {%- assign folder_active = false -%}
+        {%- for item in workdir_files -%}
+            {%- if item.url contains subdir and page.url == item.url -%}
+                {%- assign folder_active = true -%}
+                {%- break -%}
+            {%- endif -%}
+        {%- endfor -%}
         <li class="toc-category">
-            <button class="folder-toggle" type="button">
+            <button class="folder-toggle{% if folder_active %} active{% endif %}" type="button" aria-expanded="{% if folder_active %}true{% else %}false{% endif %}">
                 {{ subdir | split: "/" | last }}
             </button>
             <ul class="dropdown">
