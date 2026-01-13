@@ -1,5 +1,24 @@
 {%- include common/rest/workdir.liquid %}
 
+{% comment %} Debug: show workdir variables for troubleshooting {% endcomment %}
+<details class="toc-debug">
+  <summary>Debug: workdir variables</summary>
+  <div>
+    <p><strong>workdir_dirs (count):</strong> {{ workdir_dirs | size }}</p>
+    <ul>
+      {%- for d in workdir_dirs -%}
+        <li>{{ d }}</li>
+      {%- endfor -%}
+    </ul>
+    <p><strong>workdir_files (count):</strong> {{ workdir_files | size }}</p>
+    <ol>
+      {%- for f in workdir_files limit:8 -%}
+        <li><code>{{ f.url }}</code> — {{ f.title | default: f.name }}</li>
+      {%- endfor -%}
+    </ol>
+  </div>
+</details>
+
 {% comment %} list the root files {% endcomment %}
 <ul>
     {%- for item in workdir_files -%}
