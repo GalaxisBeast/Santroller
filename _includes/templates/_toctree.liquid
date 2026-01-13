@@ -2,63 +2,56 @@
 
 {%- assign dir = site_pages | where: "url", workdir | first -%}
 
-{%- if workdir_level == 2 %}
-    <a class="caption d-block text-uppercase no-wrap px-2 py-0" href="{{ dir.url | relative_url }}">
-        {{ dir.title | default: dir.url }}
-    </a>
-{%- else %}
-    <a class="d-flex flex-items-baseline" href="{{ dir.url | relative_url }}">
-        {{ dir.title | default: dir.url }}
-    </a>
-{%- endif -%}
+<ul class="toc-root">
 
-<ul>
-    {%- comment %} List files with first # heading {% endcomment %}
+    {%- comment %} Files: use first single # heading {% endcomment %}
     {%- for item in workdir_files -%}
         {%- assign md_content = item.content | split: "\n" -%}
         {%- assign heading = "" -%}
         {%- for line in md_content -%}
-            {%- if line startswith: "# " -%}
-                {%- assign heading = line | remove: "# " | strip -%}
+            {%- if line | slice: 0, 2 == "# " -%}
+                {%- assign heading = line | slice: 2, line.size | strip -%}
                 {%- break -%}
             {%- endif -%}
         {%- endfor -%}
 
-        {%- assign level = item.dir | append: "temp" | replace_first: "/", "" | split: "/" | size | minus: 1 -%}
-        {%- capture current -%}
-            {%- if page.url == item.url %}current{% endif -%}
-        {%- endcapture %}
+        {%- capture current -%}{%- if page.url == item.url %}current{% endif -%}{%- endcapture -%}
 
-        <li class="toc level-{{ level }} {{ current }}" data-sort="{{ item.sort }}" data-level="{{ level }}">
-            <a class="d-flex flex-items-baseline {{ current }}" href="{{ item.url | relative_url }}">
+        <li class="toc-file {{ current }}">
+            <a href="{{ item.url | relative_url }}" class="{{ current }}">
                 {{ heading | default: item.name }}
             </a>
         </li>
     {%- endfor -%}
 
-    {%- comment %} List directories as dropdowns {% endcomment %}
+    {%- comment %} Directories: category dropdowns {% endcomment %}
     {%- for subdir in workdir_dirs -%}
-        {%- assign level = subdir | append: "temp" | replace_first: "/", "" | split: "/" | size | minus: 2 -%}
-        <li class="toc level-{{ level }}">
-            <button class="folder-toggle" type="button">{{ subdir | split: "/" | last }}</button>
+        <li class="toc-category">
+            <button class="folder-toggle" type="button">
+                {{ subdir | split: "/" | last }}
+            </button>
             <ul class="dropdown">
                 {%- assign workdir = subdir -%}
                 {% include templates/_toctree.liquid %}
             </ul>
         </li>
     {%- endfor -%}
+
 </ul>
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll('.folder-toggle').forEach(btn => {
-        btn.addEventListener('click', () => btn.classList.toggle('active'));
+        btn.addEventListener('click', () => {
+            btn.classList.toggle('active');
+        });
     });
 });
 </script>
 
 <style>
-.dropdown { display: none; padding-left: 1em; }
+.toc-category > .dropdown { display: none; margin-left: 1em; }
 .folder-toggle.active + .dropdown { display: block; }
-.folder-toggle { background: none; border: none; cursor: pointer; text-align: left; width: 100%; padding: 0.2em 0; }
+.folder-toggle { background: none; border: none; font-weight: bold; cursor: pointer; padding: 0.25em 0; width: 100%; text-align: left; }
+.toc-file a.current { font-weight: bold; }
 </style>
