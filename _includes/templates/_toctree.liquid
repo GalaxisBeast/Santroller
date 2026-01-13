@@ -1,28 +1,6 @@
 {%- include common/rest/workdir.liquid %}
 
-{%- assign dir = site_pages | where: "url", workdir | first -%}
-
 <ul class="toc-root">
-
-    {%- comment %} Files: use first single # heading {% endcomment %}
-    {%- for item in workdir_files -%}
-        {%- assign md_content = item.content | split: "\n" -%}
-        {%- assign heading = "" -%}
-        {%- for line in md_content -%}
-            {%- if line | slice: 0, 2 == "# " -%}
-                {%- assign heading = line | slice: 2, line.size | strip -%}
-                {%- break -%}
-            {%- endif -%}
-        {%- endfor -%}
-
-        {%- capture current -%}{%- if page.url == item.url %}current{% endif -%}{%- endcapture -%}
-
-        <li class="toc-file {{ current }}">
-            <a href="{{ item.url | relative_url }}" class="{{ current }}">
-                {{ heading | default: item.name }}
-            </a>
-        </li>
-    {%- endfor -%}
 
     {%- comment %} Directories: category dropdowns {% endcomment %}
     {%- for subdir in workdir_dirs -%}
@@ -32,7 +10,26 @@
             </button>
             <ul class="dropdown">
                 {%- assign workdir = subdir -%}
-                {% include templates/_toctree.liquid %}
+                {%- for item in workdir_files -%}
+                    {%- if item.url contains subdir -%}
+                        {%- assign md_content = item.content | split: "\n" -%}
+                        {%- assign heading = "" -%}
+                        {%- for line in md_content -%}
+                            {%- if line | slice: 0, 2 == "# " -%}
+                                {%- assign heading = line | slice: 2, line.size | strip -%}
+                                {%- break -%}
+                            {%- endif -%}
+                        {%- endfor -%}
+
+                        {%- capture current -%}{%- if page.url == item.url %}current{% endif -%}{%- endcapture -%}
+
+                        <li class="toc-file {{ current }}">
+                            <a href="{{ item.url | relative_url }}" class="{{ current }}">
+                                {{ heading | default: item.name }}
+                            </a>
+                        </li>
+                    {%- endif -%}
+                {%- endfor -%}
             </ul>
         </li>
     {%- endfor -%}
